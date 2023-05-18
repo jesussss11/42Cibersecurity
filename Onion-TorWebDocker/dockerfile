@@ -1,0 +1,41 @@
+FROM debian:latest
+
+RUN apt-get update && apt-get install -y nginx tor sudo ssh
+
+# Configuración de nginx
+# RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+
+# COPY nginx.conf /etc/nginx/
+
+# Anadiendo mi archivo local
+COPY index.nginx-debian.html /var/www/html/
+COPY nginx.conf /etc/nginx/
+COPY torrc /etc/tor/
+COPY sshd_config /etc/ssh/
+RUN useradd -ms /bin/bash jejimene && echo "jejimene:jejimene" | chpasswd && adduser jejimene sudo
+
+
+RUN mkdir /home/jejimene/.ssh
+COPY authorized_keys /home/jejimene/.ssh/authorized_keys
+
+
+
+
+
+# RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && echo "AllowUsers newuser" >> /etc/ssh/sshd_config && /etc/init.d/ssh start
+
+
+
+EXPOSE 80 4242
+CMD service tor start && service ssh start && nginx -g 'daemon off;'
+
+
+
+
+
+
+
+# # # 80 - http / 22 - ssh / 9050 - tcp-udp
+# # EXPOSE 8080:80 4242:22 
+
+# CMD ["nginx", "-g", "daemon off;"]

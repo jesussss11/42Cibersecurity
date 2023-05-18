@@ -1,0 +1,82 @@
+#!/goinfre/jejimene/miniconda3/envs/42AI-jejimene/bin/python3
+from PIL import Image
+from PIL.ExifTags import TAGS
+import argparse
+import os
+
+
+def init():
+    parser = argparse.ArgumentParser(
+        prog="./scorpio",
+        description="Herramienta para el analisis de metadatos de imagenes",
+        epilog="Ejercicio 'arachnida' del Bootcamp de Ciberseguridad de la Fundacion 42(Malaga)"
+    )
+
+    parser.add_argument("Tipo", help="Analiza una sola imagen", type=str)
+    parser.add_argument("Contenido", help="Analiza varias imagenes",type=str)
+
+    return parser.parse_args()
+
+
+def metadata_img(paths):
+            try:
+                info = Image.open(paths)
+            except:
+                print(f"La ruta {paths} no se puede abrir")
+                return
+                 
+            print()
+            print(f"{'Nombre':32}: {info.filename.split('/')[-1]}")
+            print(f"{'Dimensiones':32}: {info.size[0]}, {info.size[1]}")
+            print(f"{'Formato':32}: {info.format}")
+            print(f"{'Modo':32}: {info.mode}")
+            print(f"{'Paleta':32}: {info.palette}")
+            try:
+                if info._getexif():
+                    
+                    try:
+                        data = info._getexif()
+                        for id in data:
+                            nombre = TAGS.get(id)
+                            valor = data.get(id)
+                            if isinstance(data, bytes):
+                                data = data.decode('UTF8','replace')
+                            print(f"{nombre:32}: {valor}")
+                    except Exception:
+                        print("Alguna informacion exif no encontrada")
+                        print()
+            except AttributeError:
+                print("Esta imagen no tiene exif")
+                print()
+
+if __name__ == "__main__":
+    args = init()
+
+    if args.Tipo and args.Contenido:
+        
+        ruta_imgsOnly = args.Tipo
+        ruta_imgsVarious = args.Contenido
+
+        if ruta_imgsOnly == "Imagen":
+            path = ruta_imgsVarious
+            metadata_img(path)
+        elif ruta_imgsOnly == "Imagenes":
+            ruta_imgs = ruta_imgsVarious
+            try:
+                contenidos = os.listdir(ruta_imgs)
+                
+            except:
+                print("La ruta introducida no es correcta")
+            try:
+                pathss = []
+                for contenido in contenidos:
+                    path = ruta_imgs+contenido
+                    pathss.append(path)
+
+                for path in pathss:
+                    metadata_img(path)
+                        
+            except NameError:
+                print("error name")
+
+

@@ -1,0 +1,253 @@
+#!/goinfre/jejimene/miniconda3/envs/42AI-jejimene/bin/python3
+from bs4 import BeautifulSoup
+from urllib.parse import *
+import requests
+import argparse
+import urllib
+import os
+from pathlib import Path,PurePath
+import errno
+def init():
+    parser = argparse.ArgumentParser(
+        prog="./spider",
+        description="Herramienta casera de Scraping de imágenes de un sitio web.",
+        epilog="Ejercicio 'arachnida' del Bootcamp de Ciberseguridad de la Fundación 42 (Málaga)."
+    )
+    parser.add_argument("URL", help="URL del sitio web a 'scrapear'", type=str)
+    parser.add_argument("-r", help="Indica que la búsqueda y descarga de imágenes será recursiva (por defecto L=5).", action="store_true")
+    parser.add_argument("-l", choices= range(1, 6), help="Nivel de profundidad para la búsqueda y descarga de imágenes", type=int, default=5)
+    parser.add_argument("-p", help="Ruta de la carpeta donde descargar las imágenes", type=str, default="./data/")
+    return parser.parse_args()
+web_pages_found_filter = []
+web_pages_found_filter1 = []
+web_pages_found_filter2 = []
+web_pages_found_filter3 = []
+web_pages_found_filter4 = []
+web_pages_found_filter5 = []
+images_found = []
+def url_detect(website):
+    try:
+        if website.startswith("file://"):
+            web_pages_found_filter.append(website)
+            search_images_file()
+        elif website.startswith('http'):
+            request_status_link1 = requests.get(website)
+            parsed = urlparse(website)
+            web_pages_found_filter.append(website)
+            if request_status_link1.status_code == 200:
+                html = BeautifulSoup(request_status_link1.content, 'html.parser')
+                id = html.find_all('a')
+                for link1 in id:
+                    href = link1.get('href')
+                    parsed1 = urlparse(href)
+                    if parsed.netloc == parsed1.netloc and href not in web_pages_found_filter1:
+                        web_pages_found_filter1.append(href)
+            for link2 in web_pages_found_filter1:
+                if link2.startswith('http'):
+                    request_status_link2 = requests.get(link2)
+                    if request_status_link2.status_code == 200:
+                        html2 = BeautifulSoup(request_status_link2.content, 'html.parser')
+                        id2 = html2.find_all('a')
+                        for link2_2 in id2:
+                            href2 = link2_2.get('href')
+                            parsed2 = urlparse(href2)
+                            if parsed2.netloc == parsed.netloc and href2 not in web_pages_found_filter2:
+                                web_pages_found_filter2.append(href2)
+            for link3 in web_pages_found_filter2:
+                if link3.startswith('http'):
+                    request_status_link3 = requests.get(link3)
+                    if request_status_link3.status_code == 200:
+                        html3 = BeautifulSoup(request_status_link3.content, 'html.parser')
+                        id3 = html3.find_all('a')
+                        for link3_3 in id3:
+                            href3 = link3_3.get('href')
+                            parsed3 = urlparse(href3)
+                            if parsed3.netloc == parsed.netloc and href3 not in web_pages_found_filter3:
+                                web_pages_found_filter3.append(href3)
+            for link4 in web_pages_found_filter3:
+                if link4.startswith('http'):
+                    request_status_link4 = requests.get(link4)
+                    if request_status_link4.status_code == 200:
+                        html4 = BeautifulSoup(request_status_link4.content, 'html.parser')
+                        id4 = html4.find_all('a')
+                        for link4_4 in id4:
+                            href4 = link4_4.get('href')
+                            parsed4 = urlparse(href4)
+                            if parsed4.netloc == parsed.netloc and href4 not in web_pages_found_filter4:
+                                web_pages_found_filter4.append(href4)
+            for link5 in web_pages_found_filter4:
+                if link5.startswith('http'):
+                    request_status_link5 = requests.get(link5)
+                    if request_status_link5.status_code == 200:
+                        html5 = BeautifulSoup(request_status_link5.content, 'html.parser')
+                        id5 = html5.find_all('a')
+                        for link5_5 in id5:
+                            href5 = link5_5.get('href')
+                            parsed5 = urlparse(href5)
+                            if parsed5.netloc == parsed.netloc and href5 not in web_pages_found_filter5:
+                                web_pages_found_filter5.append(href5)
+    except requests.ConnectionError as e:
+        print("Invalid URL. You should enter a correct URL.")
+def search_images_http():
+    for x in web_pages_found_filter:
+        if x.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img = BeautifulSoup(my_file, "html.parser")
+        elif x.startswith("http"):
+            request_status = requests.get(x)
+            html_img = BeautifulSoup(request_status.content, 'html.parser')
+        imgs_filter = html_img.find_all("img")
+        for images in imgs_filter:
+            imgs = images.get("src")
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_http1():
+    for x1 in web_pages_found_filter1:
+        if x1.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x1)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img1 = BeautifulSoup(my_file, "html.parser")
+        elif x1.startswith("http"):
+            request_status1 = requests.get(x1)
+            html_img1 = BeautifulSoup(request_status1.content, 'html.parser')
+        imgs_filter_1 = html_img1.find_all('img')
+        for images1 in imgs_filter_1:
+            imgs = images1.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_http2():
+    for x2 in web_pages_found_filter2:
+        if x2.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x2)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img2 = BeautifulSoup(my_file, "html.parser")
+        elif x2.startswith("http"):
+            request_status2 = requests.get(x2)
+            html_img2 = BeautifulSoup(request_status2.content, 'html.parser')
+        imgs_filter_2 = html_img2.find_all('img')
+        for images2 in imgs_filter_2:
+            imgs = images2.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_http3():
+    for x3 in web_pages_found_filter3:
+        if x3.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x3)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img3 = BeautifulSoup(my_file, "html.parser")
+        elif x3.startswith("http"):
+            request_status3 = requests.get(x3)
+            html_img3 = BeautifulSoup(request_status3.content, 'html.parser')
+        imgs_filter_3 = html_img3.find_all('img')
+        for images3 in imgs_filter_3:
+            imgs = images3.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_http4():
+    for x4 in web_pages_found_filter4:
+        if x4.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x4)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img4 = BeautifulSoup(my_file, "html.parser")
+        elif x4.startswith("http"):
+            request_status4 = requests.get(x4)
+            html_img4 = BeautifulSoup(request_status4.content, 'html.parser')
+        imgs_filter_4 = html_img4.find_all('img')
+        for images4 in imgs_filter_4:
+            imgs = images4.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_http5():
+    for x5 in web_pages_found_filter5:
+        if x5.startswith("file://"):
+            print("aqui estoy")
+            website_parse = urlparse(x5)
+            url = website_parse.path
+            with open(url,'r') as my_file:
+                html_img5 = BeautifulSoup(my_file, "html.parser")
+        elif x5.startswith("http"):
+            request_status5 = requests.get(x5)
+            html_img5 = BeautifulSoup(request_status5.content, 'html.parser')
+        imgs_filter_5 = html_img5.find_all('img')
+        for images5 in imgs_filter_5:
+            imgs = images5.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+    return images_found
+def search_images_file():
+        parsed = urlparse(website)
+        website1 = parsed.path
+        with open(website1, 'r') as my_file:
+            soup = BeautifulSoup(my_file, 'html.parser')
+        imgs_filter = soup.find_all('img')
+        for images in imgs_filter:
+            imgs = images.get('src')
+            if check_extension(imgs):
+                images_found.append(imgs)
+        return images_found
+def check_extension(imgs):
+    extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".docx", ".pdf"]
+    for list in extensions:
+        if imgs.endswith(list):
+            return True
+
+def get_img_path(images_found,folder):
+    os.makedirs(folder, exist_ok=True)
+    if folder == './data/':
+        a = os.getcwd()
+        b = a + '/data'
+        folder = b
+        os.chdir(folder)
+    else:
+        os.chdir(folder)
+    for link5 in images_found:
+        if link5.startswith("file://"):
+            imagen_name = link5.split("/")[-1]
+            with open(folder + "/" + imagen_name,'wb') as f:
+                urllib.request.urlretrieve(link5, imagen_name)
+        if link5.startswith("http"):
+            request_status_link5 = requests.get(link5, stream=True)
+            imagen_name = link5.split("/")[-1]
+            path = os.path.join(folder, imagen_name)
+            print(link5)
+            with open(path, "bw" ) as img:
+                img.write(request_status_link5.content)
+if __name__ == "__main__":
+    args = init()
+    website = args.URL
+    level = args.l
+    folder = args.p
+    rec = args.r
+    url_detect(website)
+    if folder:
+        if not rec:
+            search_images_http()
+        elif rec:
+            if level == 1:
+                search_images_http1()
+            elif level == 2:
+                search_images_http2()
+            elif level == 3:
+                search_images_http3()
+            elif level == 4:
+                search_images_http4()
+            else:
+                search_images_http5()
+        print(len(set(images_found)))
+        get_img_path(images_found, folder)
